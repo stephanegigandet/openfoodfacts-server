@@ -166,7 +166,7 @@ msgid ""
 "en_app_rgb_wo_135x47.png\" alt=\"Available on Google Play\" width=\"135\" "
 "height=\"47\" />"
 msgstr ""
-"<Img src =\"/ images/misc/Android-app-en google-play-"
+"<img src =\"/images/misc/Android-app-en google-play-"
 "en_app_rgb_wo_135x47.png\" alt =\"Dispoñíbel en Google Play\" width =\"135\" "
 "height =\"47\" />"
 
