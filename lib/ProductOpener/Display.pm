@@ -4449,8 +4449,8 @@ sub display_new($) {
 $meta_description
 	
 <script src="/foundation/js/vendor/jquery.js"></script>
-<script type="text/javascript" src="/js/jquery-ui-1.11.4/jquery-ui.min.js"></script>
-<link rel="stylesheet" href="/js/jquery-ui-1.11.4/jquery-ui.min.css" />
+<script type="text/javascript" src="/bower_components/jquery-ui/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="/bower_components/jquery-ui/themes/ui-lightness/jquery-ui.min.css" />
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" integrity="sha384-HIipfSYbpCkh5/1V87AWAeR5SUrNiewznrUrtNz1ux4uneLhsAKzv/0FnMbj3m6g" crossorigin="anonymous">
 <link rel="search" href="@{[ format_subdomain($subdomain) ]}/cgi/opensearch.pl" type="application/opensearchdescription+xml" title="$Lang{site_name}{$lang}" />
