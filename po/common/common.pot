@@ -2720,3 +2720,7 @@ msgstr ""
 msgctxt "translators_column_votes_made"
 msgid "Vodes Made"
 msgstr ""
+
+msgctxt "recent_changes"
+msgid "Recent Changes"
+msgstr ""

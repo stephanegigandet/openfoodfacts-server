@@ -2724,3 +2724,7 @@ msgstr "Approved (Words)"
 msgctxt "translators_column_votes_made"
 msgid "Vodes Made"
 msgstr "Vodes Made"
+
+msgctxt "recent_changes"
+msgid "Recent Changes"
+msgstr "Recent Changes"
