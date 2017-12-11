@@ -2719,3 +2719,6 @@ msgctxt "title_separator"
 msgid " — "
 msgstr " — "
 
+msgctxt "recent_changes"
+msgid "Recent Changes"
+msgstr "Letzte Änderungen"

@@ -2689,6 +2689,10 @@ msgctxt "title_separator"
 msgid " — "
 msgstr ""
 
+msgctxt "recent_changes"
+msgid "Recent Changes"
+msgstr ""
+
 msgctxt "translators_title"
 msgid "Our Translators"
 msgstr ""
@@ -2720,3 +2724,4 @@ msgstr ""
 msgctxt "translators_column_votes_made"
 msgid "Vodes Made"
 msgstr ""
+
