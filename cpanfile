@@ -44,6 +44,7 @@ requires 'CLDR::Number';
 requires 'Modern::Perl', '>= 1.20150127';
 requires 'Data::Dumper::AutoEncode';
 requires 'XML::Rules';
+requires 'Data::GUID';
 
 on 'test' => sub {
   requires 'Test::More', '>= 1.302049, < 2.0';

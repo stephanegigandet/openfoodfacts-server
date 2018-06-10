@@ -83,6 +83,8 @@ BEGIN
 					%language_fields
 					
 					%properties
+					%uuid_to_tagid
+					%tagid_to_uuid
 					
 					%language_codes
 					%language_codes_reverse
@@ -120,7 +122,7 @@ use URI::Escape::XS;
 
 use GraphViz2;
 use JSON::PP;
-
+use Data::GUID;
 
 my $debug = 0;
 
@@ -165,7 +167,10 @@ my %all_parents = ();
 
 
 %properties = ();
-
+%uuid_to_tagid = ();
+%tagid_to_uuid = ();
+my $uuid_pattern = qr/(?:[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12})/ia; # https://stackoverflow.com/a/17146162/11963
+my $uuid_line_match = qr/^_uuid:(,?\s*($uuid_pattern))/ia;
 
 %tags_images = ();
 %tags_levels = ();
@@ -551,8 +556,9 @@ sub build_tags_taxonomy($$) {
 	$just_tags{$tagtype} = {};
 	$just_synonyms{$tagtype} = {};
 	$properties{$tagtype} = {};
+	$uuid_to_tagid{$tagtype} = ();
+	$tagid_to_uuid{$tagtype} = ();	
 	
-		
 	if (open (my $IN, "<:encoding(UTF-8)", "$data_root/taxonomies/$tagtype.txt")) {
 	
 		my $current_tagid;
@@ -872,6 +878,26 @@ sub build_tags_taxonomy($$) {
 	
 
 		my %parents = ();
+		my @current_uuids = ();
+
+		sub map_uuid_to_tagid {
+			my ($tagtype, $tagid, $uuids_ref) = @_;
+
+			if ((not defined $tagtype) or (not defined $tagid)) {
+				return;
+			}
+
+			my @uuids = @{$uuids_ref};
+			if (not (@uuids)) {
+				push @uuids, Data::GUID->new();
+			}
+
+			foreach my $uuid (@uuids) {
+				$uuid_to_tagid{$tagtype}{$uuid} = $tagid;
+			}
+
+			$tagid_to_uuid{$tagtype}{$tagid} = \@uuids;
+		}
 		
 		while (<$IN>) {
 		
@@ -907,8 +933,10 @@ sub build_tags_taxonomy($$) {
 			$line =~ s/\s+$//;				
 			
 			if ($line =~ /^(\s*)$/) {
+				map_uuid_to_tagid($tagtype, $canon_tagid, \@current_uuids);
 				$canon_tagid = undef;
 				%parents = ();
+				@current_uuids = ();
 				print "taxonomy: next tag\n";
 				next;
 			}
@@ -954,7 +982,10 @@ sub build_tags_taxonomy($$) {
 						print "taxonomy: $parentid > $canon_tagid\n";
 					}
 				}
-			}			
+			}	
+			elsif ($line =~ /$uuid_line_match/i) {
+				@current_uuids = map { Data::GUID->from_string($_) } ($line =~ m/$uuid_pattern/gia);
+			}
 			elsif ($line =~ /^([a-z0-9_\-\.]+):(\w\w):(\s*)/) {
 				my $property = $1;
 				my $lc = $2;
@@ -969,7 +1000,7 @@ sub build_tags_taxonomy($$) {
 			}
 		}
 		
-	
+		map_uuid_to_tagid($tagtype, $canon_tagid, \@current_uuids);
 		close $IN;
 		
 	
@@ -1145,6 +1176,7 @@ sub build_tags_taxonomy($$) {
 				}
 			}
 			
+			print $OUT '_uuid:' . join(',', @{$tagid_to_uuid{$tagtype}{$tagid}}) . "\n" if defined $tagid_to_uuid{$tagtype}{$tagid};
 			print $OUT "\n" ;
 		
 		}
