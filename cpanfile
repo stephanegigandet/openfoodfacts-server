@@ -44,6 +44,12 @@ requires 'Modern::Perl', '>= 1.20150127';
 requires 'Data::Dumper::AutoEncode';
 requires 'XML::Rules';
 requires 'Data::GUID';
+requires 'Email::Stuffer';
+
+# Logging
+requires 'Log::Any', '>= 1.705';
+requires 'Log::Log4perl', '>= 1.49';
+requires 'Log::Any::Adapter::Log4perl', '>= 0.09';
 
 on 'test' => sub {
   requires 'Test::More', '>= 1.302049, < 2.0';
