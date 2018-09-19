@@ -44,6 +44,7 @@ requires 'Modern::Perl', '>= 1.20150127';
 requires 'Data::Dumper::AutoEncode';
 requires 'XML::Rules';
 requires 'Data::GUID';
+requires 'Email::Stuffer';
 
 # Logging
 requires 'Log::Any', '>= 1.705';

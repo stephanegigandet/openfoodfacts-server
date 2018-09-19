@@ -658,8 +658,10 @@ sub build_tags_taxonomy($$) {
 				
 				if ($tagtype eq 'ingredients') {
 				
-					foreach my $tag (@tags) {
+					foreach my $tag2 (@tags) {
 
+						my $tag = $tag2;
+					
 						$tag =~ s/^\s+//;
 						$tag = normalize_percentages($tag, $lc);
 						my $tagid = get_fileid($tag);
@@ -1033,7 +1035,9 @@ sub build_tags_taxonomy($$) {
 					if ($tagtype eq 'ingredients') {
 										
 					
-					foreach my $tag (@tags) {
+					foreach my $tag2 (@tags) {
+					
+						my $tag = $tag2;
 
 						$tag =~ s/^\s+//;
 						$tag = normalize_percentages($tag, $lc);
@@ -1398,20 +1402,6 @@ foreach my $langid (readdir(DH2)) {
 	next if $langid eq '..';
 	# print STDERR "Tags.pm - reading tagtypes for lang $langid\n";
 	next if ((length($langid) ne 2) and not ($langid eq 'other'));
-
-	if (0) {
-	if (-e "$data_root/lang/$langid/tags") {
-		opendir DH, "$data_root/lang/$langid/tags" or die "Couldn't open the current directory: $!";
-		foreach my $tagtype (readdir(DH)) {
-			next if $tagtype !~ /(.*)\.txt/;
-			$tagtype = $1;
-			# print STDERR "Tags: loading tagtype $langid/$tagtype\n";			
-			# print "Tags: loading tagtype $langid/$tagtype\n";			
-			load_tags_hierarchy($langid, $tagtype);
-		}
-		closedir(DH);
-	}
-	}
 	
 	if (-e "$www_root/images/lang/$langid") {
 		opendir DH, "$www_root/images/lang/$langid" or die "Couldn't open the current directory: $!";
@@ -1559,7 +1549,8 @@ sub gen_tags_hierarchy($$) {
 	
 	my %tags = ();
 	
-	foreach my $tag (split(/(\s*),(\s*)/, $tags_list)) {
+	foreach my $tag2 (split(/(\s*),(\s*)/, $tags_list)) {
+		my $tag = $tag2;
 		$tag = canonicalize_tag2($tagtype, $tag);
 		my $tagid = get_fileid($tag);
 		next if $tagid eq '';
@@ -1598,7 +1589,8 @@ sub gen_tags_hierarchy_taxonomy($$$) {
 	
 	my %tags = ();
 	
-	foreach my $tag (split(/(\s*),(\s*)/, $tags_list)) {
+	foreach my $tag2 (split(/(\s*),(\s*)/, $tags_list)) {
+		my $tag = $tag2;
 		my $l = $tag_lc;
 		if ($tag =~ /^(\w\w):/) {
 			$l = $1;
@@ -1646,7 +1638,8 @@ sub gen_ingredients_tags_hierarchy_taxonomy($$) {
 	
 	my @tags = ();
 	
-	foreach my $tag (split(/(\s*),(\s*)/, $tags_list)) {
+	foreach my $tag2 (split(/(\s*),(\s*)/, $tags_list)) {
+		my $tag = $tag2;
 		my $l = $tag_lc;
 		if ($tag =~ /^(\w\w):/) {
 			$l = $1;
