@@ -30,15 +30,15 @@ my $expected_product_ref = {
                                     '11-20'
                                   ],
           'ingredients_original_tags' => [
-                                           'fr:farine',
+                                           'en:flour',
                                            'en:chocolate',
                                            'en:sugar',
-                                           'fr:protéines de lait',
+                                           'en:milk protein',
                                            'en:egg',
-                                           'fr:émulsifiants',
+                                           'en:emulsifier',
                                            'fr:E463',
                                            'fr:E432 et E472',
-                                           'fr:correcteurs d\'acidité',
+                                           'en:acidity regulator',
                                            'fr:e475',
                                            'en:acid',
                                            'en:salt',
@@ -49,15 +49,15 @@ my $expected_product_ref = {
                                            'en:phosphoric-acid'
                                          ],
           'ingredients_hierarchy' => [
-                                       'fr:farine',
+                                       'en:flour',
                                        'en:chocolate',
                                        'en:sugar',
-                                       "fr:prot\x{c3}\x{a9}ines de lait",
+                                       'en:milk protein',
                                        'en:egg',
-                                       "fr:\x{c3}\x{a9}mulsifiants",
+                                       'en:emulsifier',
                                        'fr:E463',
                                        'fr:E432 et E472',
-                                       "fr:correcteurs d'acidit\x{c3}\x{a9}",
+                                       'en:acidity regulator',
                                        'fr:e475',
                                        'en:acid',
                                        'en:salt',
@@ -69,15 +69,15 @@ my $expected_product_ref = {
                                        'en:phosphoric-acid'
                                      ],
           'ingredients_tags' => [
-                                  'fr:farine',
+                                  'en:flour',
                                   'en:chocolate',
                                   'en:sugar',
-                                  'fr:prota-ines-de-lait',
+                                  'en:milk protein',
                                   'en:egg',
-                                  'fr:a-mulsifiants',
+                                  'en:emulsifier',
                                   'fr:e463',
                                   'fr:e432-et-e472',
-                                  'fr:correcteurs-d-acidita',
+                                  'en:acidity regulator',
                                   'fr:e475',
                                   'en:acid',
                                   'en:salt',
@@ -94,7 +94,7 @@ my $expected_product_ref = {
                              {
                                'percent' => '12',
                                'text' => 'farine',
-                               'id' => 'fr:farine',
+                               'id' => 'en:flour',
                                'rank' => 1
                              },
                              {
@@ -110,7 +110,7 @@ my $expected_product_ref = {
                              },
                              {
                                'text' => 'protéines de lait',
-                               'id' => 'fr:protéines de lait',
+                               'id' => 'en:milk protein',
                                'rank' => 4
                              },
                              {
@@ -120,7 +120,7 @@ my $expected_product_ref = {
                              },
                              {
                                'text' => 'émulsifiants',
-                               'id' => 'fr:émulsifiants',
+                               'id' => 'en:emulsifier',
                                'rank' => 6
                              },
                              {
@@ -135,7 +135,7 @@ my $expected_product_ref = {
                              },
                              {
                                'text' => 'correcteurs d\'acidité',
-                               'id' => 'fr:correcteurs d\'acidité',
+                               'id' => 'en:acidity regulator',
                                'rank' => 9
                              },
                              {
