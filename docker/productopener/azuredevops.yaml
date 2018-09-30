@@ -1,0 +1,63 @@
+# Default values for productopener.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+host: po.2cd5584aef954497b837.eastus.aksapp.io
+
+backend:
+  name: backend
+  replicaCount: 1
+  image:
+    repository: openfoodfacts/productopener-backend
+    tag: "20180929.3"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+
+frontend:
+  name: frontend
+  replicaCount: 1
+  image:
+    repository: openfoodfacts/productopener-frontend
+    tag: "20180929.3"
+    pullPolicy: IfNotPresent
+  service:
+    type: LoadBalancer
+    port: 80
+
+nameOverride: ""
+fullnameOverride: ""
+
+ingress:
+  enabled: true
+  annotations:
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: addon-http-application-routing
+  path: /*
+  hosts:
+    - po.2cd5584aef954497b837.eastus.aksapp.io
+    - '*.po.2cd5584aef954497b837.eastus.aksapp.io'
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
