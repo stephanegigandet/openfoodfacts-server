@@ -23,7 +23,7 @@ frontend:
     tag: "20180929.3"
     pullPolicy: IfNotPresent
   service:
-    type: LoadBalancer
+    type: ClusterIP
     port: 80
 
 nameOverride: ""
