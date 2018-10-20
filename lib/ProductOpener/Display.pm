@@ -118,8 +118,6 @@ use URI::Escape::XS;
 use CGI qw/:cgi :form escapeHTML/;
 use HTML::Entities;
 use DateTime;
-use DateTime::Format::Mail;
-use DateTime::Format::CLDR;
 use DateTime::Locale;
 use experimental 'smartmatch';
 use MongoDB;
@@ -781,7 +779,7 @@ sub display_form($) {
 	return "<p>$s</p>";
 }
 
-sub display_date($) {
+sub _get_date($) {
 
 	my $t = shift;
 
@@ -799,12 +797,22 @@ sub display_date($) {
 			locale => $locale,
 			time_zone => $reference_timezone,
 			epoch => $t );
-		my $formatter = DateTime::Format::CLDR->new(
-		    pattern => $locale->datetime_format_long,
-		    locale => $locale
-		);
-		$dt->set_formatter($formatter);
 		return $dt;
+	}
+	else {
+		return;
+	}
+
+}
+
+
+sub display_date($) {
+
+	my $t = shift;
+	my $dt = _get_date($t);
+
+	if (defined $dt) {
+		return $dt->format_cldr($dt->locale()->datetime_format_long);
 	}
 	else {
 		return;
@@ -815,27 +823,10 @@ sub display_date($) {
 sub display_date_without_time($) {
 
 	my $t = shift;
+	my $dt = _get_date($t);
 
-	if (defined $t) {
-		my @codes = DateTime::Locale->codes;
-		my $locale;
-		if ( $lc ~~ @codes ) {
-			$locale = DateTime::Locale->load($lc);
-		}
-		else {
-			$locale = DateTime::Locale->load('en');
-		}
-	
-		my $dt = DateTime->from_epoch(
-			locale => $locale,
-			time_zone => $reference_timezone,
-			epoch => $t );
-		my $formatter = DateTime::Format::CLDR->new(
-		    pattern => $locale->date_format_long,
-		    locale => $locale
-		);
-		$dt->set_formatter($formatter);
-		return $dt;
+	if (defined $dt) {
+		return $dt->format_cldr($dt->locale()->date_format_long);
 	}
 	else {
 		return;
@@ -846,10 +837,11 @@ sub display_date_without_time($) {
 sub display_date_tag($) {
 
 	my $t = shift;
-	my $dt = display_date($t);
+	my $dt = _get_date($t);
 	if (defined $dt) {
-		my $iso = $dt->iso8601;;
-		return "<time datetime=\"$iso\">$dt</time>";
+		my $iso = $dt->iso8601;
+		my $dts = $dt->format_cldr($dt->locale()->datetime_format_long);
+		return "<time datetime=\"$iso\">$dts</time>";
 	}
 	else {
 		return;
@@ -8053,7 +8045,10 @@ JS
 	
 	if (defined $product_ref->{stats}) {
 	
-		push @cols, 'std', 'min', '10', '50', '90', 'max';
+		foreach my $col ('std', 'min', '10', '50', '90', 'max') {
+			push @cols, $col; 
+			$col_name{$col} = lang("nutrition_data_per_$col");
+		}
 		
 		if ($product_ref->{id} ne 'search') {
 		
@@ -8186,7 +8181,8 @@ HTML
 		# display nutrition score only when the country is matching
 		
 		if ($nid =~ /^nutrition-score-(.*)$/) {
-			if ($cc ne $1) {
+			# Always show the FR score and Nutri-Score
+			if (($cc ne $1) and (not ($1 eq 'fr'))) {
 				$shown = 0;
 			}
 			else {
@@ -8295,11 +8291,38 @@ HTML
 						. '<span class="compare_value" style="display:none">' . (sprintf("%.2e", g_to_unit($comparison_ref->{nutriments}{$nid . "_100g"} / 2.54, $unit)) + 0.0) . " " . $unit . '</span>' . "</td>";
 					}
 				}				
+				
+				if ($nid eq 'nutrition-score-fr') {
+					# We need to know the category in order to select the right thresholds for the nutrition grades
+					# as it depends on whether it is food or drink
+					
+					# if it is a category stats, the category id is the id field
+					if ((not defined $product_ref->{categories_tags})
+						and (defined $product_ref->{id}) 
+						and ($product_ref->{id} =~ /^en:/) 
+							) {
+						$product_ref->{categories} = $product_ref->{id};
+						compute_field_tags($product_ref, "categories");
+					}
+					
+					if (defined $product_ref->{categories_tags}) {
+					
+						$values2 .= "<td class=\"nutriment_value${col_class}\">"
+							. uc (compute_nutrition_grade($product_ref, $comparison_ref->{nutriments}{$nid . "_100g"}))
+							. "</td>";
+					}
+				}
+				
 			}
 			else {
 			
 				my $value_unit = "";
 				my $rdfa = '';
+				
+				# Nutriscore: per serving = per 100g
+				if (($nid =~ /nutrition-score/) and ($col eq "serving")) {
+					$product_ref->{nutriments}{$nid . "_$col"} = $product_ref->{nutriments}{$nid . "_100g"};
+				}
 				
 				if ((not defined $product_ref->{nutriments}{$nid . "_$col"}) or ($product_ref->{nutriments}{$nid . "_$col"} eq '')) {
 					$value_unit = '?';
@@ -8348,13 +8371,37 @@ HTML
 						}
 						$values2 .= "<td class=\"nutriment_value${col_class}\" $property>" . $sodium . " " . $unit . "</td>";
 					}				
+					elsif ($nid eq 'nutrition-score-fr') {
+						# We need to know the category in order to select the right thresholds for the nutrition grades
+						# as it depends on whether it is food or drink
+						
+						# if it is a category stats, the category id is the id field
+						if ((not defined $product_ref->{categories_tags})
+							and (defined $product_ref->{id}) 
+							and ($product_ref->{id} =~ /^en:/) 
+								) {
+							$product_ref->{categories} = $product_ref->{id};
+							compute_field_tags($product_ref, "categories");
+						}
+						
+						if (defined $product_ref->{categories_tags}) {
+						
+							if ($col eq "std") {
+								$values2 .= "<td class=\"nutriment_value${col_class}\"></td>";
+							}
+							else {
+								$values2 .= "<td class=\"nutriment_value${col_class}\">"
+								. uc (compute_nutrition_grade($product_ref, $product_ref->{nutriments}{$nid . "_$col"}))
+								. "</td>";
+							}
+						}
+					}					
 					elsif ($col eq $product_ref->{nutrition_data_per}) {
 						# % DV ?
 						if ((defined $product_ref->{nutriments}{$nid . "_value"}) and (defined $product_ref->{nutriments}{$nid . "_unit"}) and ($product_ref->{nutriments}{$nid . "_unit"} eq '% DV')) {
 							$value_unit .= ' (' . $product_ref->{nutriments}{$nid . "_value"} . ' ' . $product_ref->{nutriments}{$nid . "_unit"} . ')';
 						}
-					}
-					
+					}					
 					
 					if ($col eq '100g') {
 						my $property = $nid;
@@ -8402,6 +8449,20 @@ $values2
 HTML
 ;
 		}		
+		
+		if (($nid eq 'nutrition-score-fr') and ($values2 ne '')) {
+			$input .= <<HTML
+<tr id="nutriment_nutriscore_tr" class="nutriment_sub">
+<td class="nutriment_label">
+HTML
+. "Nutri-Score" . <<HTML
+</td>
+$values2
+</tr>			
+HTML
+;
+		}		
+		
 		
 		#print STDERR "nutrition_table - nid: $nid - shown: $shown \n";
 
