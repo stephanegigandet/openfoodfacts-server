@@ -9,7 +9,7 @@ backend:
   replicaCount: 1
   image:
     repository: openfoodfacts/productopener-backend
-    tag: "20180929.3"
+    tag: "20181021.3"
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
@@ -20,11 +20,18 @@ frontend:
   replicaCount: 1
   image:
     repository: openfoodfacts/productopener-frontend
-    tag: "20180929.3"
+    tag: "20181021.3"
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
     port: 80
+
+memcached:
+  replicaCount: 1
+  pdbMinAvailable: 1
+
+mongodb:
+  usePassword: false
 
 nameOverride: ""
 fullnameOverride: ""
