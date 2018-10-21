@@ -53,12 +53,16 @@ spec:
             - containerPort: 80
               name: http
           livenessProbe:
-            timeoutSeconds: 120
+            timeoutSeconds: 5
+            initialDelaySeconds: 60
             httpGet:
               path: /
               port: http
           readinessProbe:
-            timeoutSeconds: 120
+            timeoutSeconds: 5
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            failureThreshold: 10
             httpGet:
               path: /
               port: http
