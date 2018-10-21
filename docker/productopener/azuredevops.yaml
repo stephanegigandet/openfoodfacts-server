@@ -9,7 +9,7 @@ backend:
   replicaCount: 1
   image:
     repository: openfoodfacts/productopener-backend
-    tag: "20181021.3"
+    tag: "20181021.6"
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
@@ -20,7 +20,7 @@ frontend:
   replicaCount: 1
   image:
     repository: openfoodfacts/productopener-frontend
-    tag: "20181021.3"
+    tag: "20181021.6"
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
