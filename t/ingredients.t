@@ -396,7 +396,7 @@ $expected_product_ref = {
                                            'en:concentrated-orange-juice',
                                            "fr:\x{e9}quivalent jus d'orange",
                                            'fr:citrate-de-calcium',
-                                           'fr:citrate-de-sodium',
+                                           'en:sodium-citrate',
                                            'en:sugar',
                                            'en:cocoa-paste',
                                            'en:cocoa-butter',
@@ -406,8 +406,8 @@ $expected_product_ref = {
                                            'fr:sal',
                                            "fr:karit\x{e9} et palme en proportions variables",
                                            'fr:carbonate-acide-d-ammonium',
-                                           'fr:diphosphate-disodique',
-                                           'fr:carbonate-acide-de-sodium'
+                                           'en:disodium-diphosphate',
+                                           'en:sodium-hydrogen-carbonate'
                                          ],
           'ingredients_hierarchy' => [
                                        'fr:Marmelade d\'oranges',
@@ -469,7 +469,7 @@ $expected_product_ref = {
                                        'en:fruit',
                                        "fr:\x{e9}quivalent jus d'orange",
                                        'fr:citrate-de-calcium',
-                                       'fr:citrate-de-sodium',
+                                       'en:sodium-citrate',
                                        'en:sugar',
                                        'en:cocoa-paste',
                                        'en:cocoa-butter',
@@ -486,8 +486,8 @@ $expected_product_ref = {
                                        'fr:sal',
                                        "fr:karit\x{e9} et palme en proportions variables",
                                        'fr:carbonate-acide-d-ammonium',
-                                       'fr:diphosphate-disodique',
-                                       'fr:carbonate-acide-de-sodium'
+                                       'en:disodium-diphosphate',
+                                       'en:sodium-hydrogen-carbonate'
                                      ],
           'ingredients_tags' => [
                                   'fr:marmelade-d-oranges',
@@ -549,7 +549,7 @@ $expected_product_ref = {
                                   'en:fruit',
                                   'fr:equivalent-jus-d-orange',
                                   'fr:citrate-de-calcium',
-                                  'fr:citrate-de-sodium',
+                                  'en:sodium-citrate',
                                   'en:sugar',
                                   'en:cocoa-paste',
                                   'en:cocoa-butter',
@@ -566,8 +566,8 @@ $expected_product_ref = {
                                   'fr:sal',
                                   'fr:karite-et-palme-en-proportions-variables',
                                   'fr:carbonate-acide-d-ammonium',
-                                  'fr:diphosphate-disodique',
-                                  'fr:carbonate-acide-de-sodium'
+                                  'en:disodium-diphosphate',
+                                  'en:sodium-hydrogen-carbonate'
                                 ],
           'ingredients_text' => "Marmelade d'oranges 41% (sirop de glucose-fructose, sucre, pulpe d'orange 4.5%, jus d'orange concentr\x{e9} 1.4% (\x{e9}quivalent jus d'orange 7.8%), pulpe d'orange concentr\x{e9}e 0.6% (\x{e9}quivalent pulpe d'orange 2.6%), g\x{e9}lifiant (pectines), acidifiant (acide citrique), correcteurs d'acidit\x{e9} (citrate de calcium, citrate de sodium), ar\x{f4}me naturel d'orange, \x{e9}paississant (gomme xanthane)), chocolat 24.9% (sucre, p\x{e2}te de cacao, beurre de cacao, graisses v\x{e9}g\x{e9}tales (illipe, mangue, sal, karit\x{e9} et palme en proportions variables), ar\x{f4}me, \x{e9}mulsifiant (l\x{e9}cithine de soja), lactose et prot\x{e9}ines de lait), farine de bl\x{e9}, sucre, oeufs, sirop de glucose-fructose, huile de colza, poudre \x{e0} lever (carbonate acide d'ammonium, diphosphate disodique, carbonate acide de sodium), sel, \x{e9}mulsifiant (l\x{e9}cithine de soja).",
           'lc' => 'fr',
@@ -730,7 +730,7 @@ $expected_product_ref = {
                              },
                              {
                                'text' => 'citrate de sodium',
-                               'id' => 'fr:citrate-de-sodium'
+                               'id' => 'en:sodium-citrate'
                              },
                              {
                                'text' => 'sucre',
@@ -770,11 +770,11 @@ $expected_product_ref = {
                              },
                              {
                                'text' => 'diphosphate disodique',
-                               'id' => 'fr:diphosphate-disodique'
+                               'id' => 'en:disodium-diphosphate'
                              },
                              {
                                'text' => 'carbonate acide de sodium',
-                               'id' => 'fr:carbonate-acide-de-sodium'
+                               'id' => 'en:sodium-hydrogen-carbonate'
                              }
                            ],
           'unknown_ingredients_n' => 6,
@@ -853,6 +853,98 @@ $expected_product_ref = {
 
 is_deeply($product_ref, $expected_product_ref);
 
+
+my $product_ref = {
+        lc => "fr",
+        ingredients_text => "pâte de cacao* de Madagascar 75%, sucre de canne*, beurre de cacao*. * issus du commerce équitable et de l'agriculture biologique (100% du poids total)."
+};
+
+extract_ingredients_from_text($product_ref);
+
+delete $product_ref->{additives_prev_original_tags};
+delete $product_ref->{additives_prev_tags};
+delete $product_ref->{additives_prev};
+delete $product_ref->{additives_prev_n};
+delete $product_ref->{minerals_prev_original_tags};
+delete $product_ref->{vitamins_prev_tags};
+delete $product_ref->{nucleotides_prev_tags};
+delete $product_ref->{amino_acids_prev_tags};
+delete $product_ref->{minerals_prev_tags};
+delete $product_ref->{minerals_prev};
+
+
+use Data::Dumper;
+print STDERR Dumper($product_ref);
+
+$expected_product_ref = {
+
+          'ingredients_n_tags' => [
+                                    '5',
+                                    '1-10'
+                                  ],
+          'ingredients_original_tags' => [
+                                           "fr:p\x{e2}te de cacao* de Madagascar",
+                                           'en:cane-sugar',
+                                           'en:cocoa-butter',
+                                           "fr:issus du commerce \x{e9}quitable et de l'agriculture biologique",
+                                           'fr:du poids total'
+                                         ],
+          'ingredients_hierarchy' => [
+                                       "fr:p\x{e2}te de cacao* de Madagascar",
+                                       'en:cane-sugar',
+                                       'en:sugar',
+                                       'en:cocoa-butter',
+                                       'en:cocoa',
+                                       "fr:issus du commerce \x{e9}quitable et de l'agriculture biologique",
+                                       'fr:du poids total'
+                                     ],
+          'ingredients_tags' => [
+                                  'fr:pate-de-cacao-de-madagascar',
+                                  'en:cane-sugar',
+                                  'en:sugar',
+                                  'en:cocoa-butter',
+                                  'en:cocoa',
+                                  'fr:issus-du-commerce-equitable-et-de-l-agriculture-biologique',
+                                  'fr:du-poids-total'
+                                ],
+          'ingredients_text' => "p\x{e2}te de cacao* de Madagascar 75%, sucre de canne*, beurre de cacao*. * issus du commerce \x{e9}quitable et de l'agriculture biologique (100% du poids total).",
+          'lc' => 'fr',
+          'ingredients' => [
+                             {
+                               'percent' => '75',
+                               'text' => "p\x{e2}te de cacao* de Madagascar",
+                               'id' => "fr:p\x{e2}te de cacao* de Madagascar",
+                               'rank' => 1
+                             },
+                             {
+                               'text' => 'sucre de canne',
+                               'id' => 'en:cane-sugar',
+                               'rank' => 2
+                             },
+                             {
+                               'text' => 'beurre de cacao',
+                               'id' => 'en:cocoa-butter',
+                               'rank' => 3
+                             },
+                             {
+                               'text' => "issus du commerce \x{e9}quitable et de l'agriculture biologique",
+                               'id' => "fr:issus du commerce \x{e9}quitable et de l'agriculture biologique",
+                               'rank' => 4
+                             },
+                             {
+                               'percent' => '100',
+                               'text' => 'du poids total',
+                               'id' => 'fr:du poids total',
+                               'rank' => 5
+                             }
+                           ],
+          'unknown_ingredients_n' => 3,
+          'ingredients_n' => 5
+
+        };
+
+
+is_deeply($product_ref, $expected_product_ref);
 
 
 done_testing();

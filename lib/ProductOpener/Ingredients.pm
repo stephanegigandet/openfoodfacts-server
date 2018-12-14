@@ -32,6 +32,9 @@ BEGIN
 					&extract_ingredients_from_image
 					&extract_ingredients_from_text
 					
+					&clean_ingredients_text_for_lang
+					&clean_ingredients_text
+					
 					&extract_ingredients_classes_from_text
 					
 					&detect_allergens_from_text
@@ -252,6 +255,14 @@ sub extract_ingredients_from_image($$$) {
 	
 	}
 	
+	# remove nutrition facts etc.
+	if (($status == 0) and (defined $product_ref->{ingredients_text_from_image})) {
+	
+		$product_ref->{ingredients_text_from_image_orig} = $product_ref->{ingredients_text_from_image};
+		$product_ref->{ingredients_text_from_image} = clean_ingredients_text_for_lang($product_ref->{ingredients_text_from_image}, $lc);
+	
+	}
+	
 	
 	return $status;
 
@@ -262,6 +273,7 @@ sub extract_ingredients_from_text($) {
 
 	my $product_ref = shift;
 	my $path = product_path($product_ref->{code});
+	
 	my $text = $product_ref->{ingredients_text};
 	
 	$log->debug("extracting ingredients from text", { text => $text }) if $log->is_debug();
@@ -588,6 +600,160 @@ sub normalize_vitamins_enumeration($$) {
 
 	return $split_vitamins_list;
 }
+
+
+my %phrases_before_ingredients_list = (
+
+fr => [
+
+'ingr(e|é)dients(\s*)(-|:|\r|\n)',	# need a colon or a line feed
+
+],
+
+);
+
+
+my %phrases_before_ingredients_list_uppercase = (
+
+fr => [
+
+'INGR(E|É)DIENTS(\s|-|:|\r|\n)',	# need a colon or a line feed
+
+],
+
+);
+
+
+my %phrases_after_ingredients_list = (
+
+# TODO: Introduce a common list for kcal
+
+fr => [
+
+'(valeurs|informations|d(e|é)claration|analyse|rep(e|è)res) (nutritionnel)',
+'nutritionnelles moyennes', 	# in case of ocr issue on the first word "valeurs"
+'valeur(s?) (e|é)nerg(e|é)tique',
+'((\d+)(\s?)kJ\s+)?(\d+)(\s?)kcal',
+'(a|à) consommer de préférence',
+'conseils de pr(e|é)paration',
+'(a|à) protéger de ', # humidité, chaleur, lumière etc.
+'conditionn(e|é) sous atmosph(e|è)re protectrice',
+'la pr(e|é)sence de vide',	# La présence de vide au fond du pot est due au procédé de fabrication.
+'(a|à) consommer (cuit|rapidement|dans|jusqu)',
+'(a|à) conserver (dans|de|a|à)',
+'apr(e|è)s ouverture',
+
+],
+
+en => [
+
+'nutritional values',
+'after opening',
+'nutrition values',
+'((\d+)(\s?)kJ\s+)?(\d+)(\s?)kcal',
+
+],
+
+es => [
+'valores nutricionales'
+],
+
+de => [
+'Ernährungswerte',
+'Vorbereitung Tipps',
+],
+
+nl => [
+'voedingswaarden',
+'voorbereidingstips',
+],
+
+it => [
+'valori nutrizionali',
+'consigli per la preparazione',
+],
+
+
+);
+
+
+
+sub clean_ingredients_text_for_lang($$) {
+
+	my $text = shift;
+	my $language = shift;
+
+	if (defined $phrases_before_ingredients_list{$language}) {
+				
+		foreach my $regexp (@{$phrases_before_ingredients_list{$language}}) {
+			$text =~ s/^(.*)$regexp(\s*)//ies;
+		}			
+	}	
+	
+	if (defined $phrases_before_ingredients_list_uppercase{$language}) {
+				
+		foreach my $regexp (@{$phrases_before_ingredients_list_uppercase{$language}}) {
+			# INGREDIENTS followed by lowercase
+			$text =~ s/^(.*)$regexp(\s*)(?=(\w?)(\w?)[a-z])//es;
+		}			
+	}		
+	
+	
+	if (defined $phrases_after_ingredients_list{$language}) {
+				
+		foreach my $regexp (@{$phrases_after_ingredients_list{$language}}) {
+			$text =~ s/\s*$regexp(.*)$//ies;
+		}			
+	}
+	
+	# non language specific cleaning
+	# try to add missing spaces around dashes - separating ingredients
+	
+	# jus d'orange à base de concentré 14%- sucre
+	$text =~ s/(\%)- /$1 - /g;
+	
+	# persil- poivre blanc -ail
+	$text =~ s/(\w|\*)- /$1 - /g;
+	$text =~ s/ -(\w)/ - $1/g;	
+	
+	return $text;
+}
+
+
+
+sub clean_ingredients_text($) {
+
+	my $product_ref = shift;
+
+	if (defined $product_ref->{languages_codes}) {
+	
+		foreach my $language (keys %{$product_ref->{languages_codes}}) {
+		
+			if (defined $product_ref->{"ingredients_text_" . $language }) {
+				
+				my $text = $product_ref->{"ingredients_text_" . $language };
+				
+				$text = clean_ingredients_text_for_lang($text, $language);
+								
+				if ($text ne $product_ref->{"ingredients_text_" . $language }) {
+				
+					my $time = time();
+					
+					# Keep a copy of the original ingredients list just in case
+					$product_ref->{"ingredients_text_" . $language . "_ocr_" . $time} = $product_ref->{"ingredients_text_" . $language };
+					$product_ref->{"ingredients_text_" . $language . "_ocr_" . $time . "_result"} = $text;
+					$product_ref->{"ingredients_text_" . $language } = $text;	
+				}
+				
+				if ($language eq $product_ref->{lc}) {
+					$product_ref->{"ingredients_text"} = $product_ref->{"ingredients_text_" . $language };
+				}					
+			}		
+		}	
+	}
+}
+	
+	
 
 
 sub extract_ingredients_classes_from_text($) {
@@ -1243,7 +1409,7 @@ INFO
 		$product_ref->{$tagtype . '_tags'} = [];		
 				
 		# skip palm oil classes if there is a palm oil free label
-		if (($class =~ /palm/) and ($product_ref->{labels_tags} ~~ 'en:palm-oil-free')) {
+		if (($class =~ /palm/) and has_tag($product_ref, "labels", 'en:palm-oil-free')) {
 			
 		}
 		else {
@@ -1404,7 +1570,10 @@ sub replace_allergen($$$$) {
 	
 	# to build the product allergens list, just use the ingredients in the main language
 	if ($language eq $product_ref->{lc}) {
-		$product_ref->{$field . "_from_ingredients"} .= $allergen . ', ';
+		# skip allergens like "moutarde et céleri" (will be caught later by replace_allergen_between_separators)
+		if (not (($language eq 'fr') and $allergen =~ / et /i)) {
+			$product_ref->{$field . "_from_ingredients"} .= $allergen . ', ';
+		}
 	}
 	
 	return '<span class="allergen">' . $allergen . '</span>';
@@ -1418,7 +1587,7 @@ sub replace_allergen_in_caps($$$$) {
 	my $before = shift;
 	
 	my $field = "allergens";
-	if ($before =~ /\b(peut contenir|qui utilise aussi|traces|may contain)\b/i) {
+	if ($before =~ /\b(peut contenir|qui utilise aussi|traces|trace|may contain)\b/i) {
 		$field = "traces";
 	}
 	
@@ -1451,7 +1620,7 @@ sub replace_allergen_between_separators($$$$$$) {
 	my $field = "allergens";
 	
 	
-	print STDERR "allergen: $allergen\n";
+	#print STDERR "allergen: $allergen\n";
 	
 	my $stopwords = "d'autres|autre|autres|ce|produit|est|fabriqué|élaboré|transformé|emballé|dans|un|atelier|une|usine|qui|utilise|aussi|également|céréale|céréales|farine|farines|extrait|extraits|graine|graines|traces|éventuelle|éventuelles|possible|possibles|peut|pourrait|contenir|contenant|contient|de|des|du|d'|l'|la|le|les|et|and|of";
 	
@@ -1461,9 +1630,9 @@ sub replace_allergen_between_separators($$$$$$) {
 		$allergen =~ s/^(\s|\b($stopwords)\b)+//i;
 	}
 	
-	if (($before . $before_allergen) =~ /\b(peut contenir|qui utilise aussi|traces|may contain)\b/i) {
+	if (($before . $before_allergen) =~ /\b(peut contenir|qui utilise aussi|traces|trace|may contain)\b/i) {
 		$field = "traces";
-		print STDERR "traces (before_allergen: $before_allergen - before: $before)\n";
+		#print STDERR "traces (before_allergen: $before_allergen - before: $before)\n";
 	}	
 	
 	# Farine de blé 97%
@@ -1472,11 +1641,11 @@ sub replace_allergen_between_separators($$$$$$) {
 		$end_separator = $1 . $' . $end_separator;
 	}
 	
-	print STDERR "before_allergen: $before_allergen - allergen: $allergen\n";
+	#print STDERR "before_allergen: $before_allergen - allergen: $allergen\n";
 	
 	my $tagid = canonicalize_taxonomy_tag($language,"allergens", $allergen);
 	
-	print STDERR "before_allergen: $before_allergen - allergen: $allergen - tagid: $tagid\n";
+	#print STDERR "before_allergen: $before_allergen - allergen: $allergen - tagid: $tagid\n";
 	
 	if (exists_taxonomy_tag("allergens", $tagid)) {
 		#$allergen = display_taxonomy_tag($product_ref->{lang},"allergens", $tagid);
@@ -1513,9 +1682,11 @@ sub detect_allergens_from_text($) {
 		
 			my $text = $product_ref->{"ingredients_text_" . $language };
 			
+			next if not defined $text;
+			
 			# allergens between underscores
 			
-			print STDERR "current text 1: $text\n";
+			# print STDERR "current text 1: $text\n";
 	
 			$text =~ s/\b_([^,;_\(\)\[\]]+?)_\b/replace_allergen($language,$product_ref,$1,$`)/iesg;
 	
@@ -1526,8 +1697,10 @@ sub detect_allergens_from_text($) {
 			}
 			
 			# allergens between separators
-			print STDERR "current text 2: $text\n";
-			print STDERR "separators\n";
+			
+			#print STDERR "current text 2: $text\n";
+			# print STDERR "separators\n";
+			
 			# positive look ahead for the separators so that we can properly match the next word
 			# match at least 3 characters so that we don't match the separator
 			# Farine de blé 97% -> make numbers be separators
@@ -1556,12 +1729,12 @@ sub detect_allergens_from_text($) {
 
 		$product_ref->{$field . "_hierarchy" } = [ gen_tags_hierarchy_taxonomy($product_ref->{lc}, $field, $allergens) ];
 		$product_ref->{$field . "_tags" } = [];
-		print STDERR "result for $field : ";
+		# print STDERR "result for $field : ";
 		foreach my $tag (@{$product_ref->{$field . "_hierarchy" }}) {
 			push @{$product_ref->{$field . "_tags" }}, get_taxonomyid($tag);
-			print STDERR " - $tag";
+			# print STDERR " - $tag";
 		}
-		print STDERR "\n";
+		# print STDERR "\n";
 	}
 	
 }

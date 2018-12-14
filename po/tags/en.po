@@ -388,11 +388,11 @@ msgctxt "amino_acids:singular"
 msgid "amino-acid"
 msgstr "amino-acid"
 
-msgctxt "amino_acid:plural"
+msgctxt "amino_acids:plural"
 msgid "amino-acids"
 msgstr "amino-acids"
 
-msgctxt "nucleotide:singular"
+msgctxt "nucleotides:singular"
 msgid "nucleotide"
 msgstr "nucleotide"
 
@@ -416,4 +416,11 @@ msgctxt "nova_groups:plural"
 msgid "nova-groups"
 msgstr "nova-groups"
 
+msgctxt "last_check_dates:plural"
+msgid   "last-check-dates"
+msgstr  "last-check-dates"
+
+msgctxt "last_check_dates:singular"
+msgid   "last-check-date"
+msgstr  "last-check-date"
 

@@ -114,7 +114,7 @@ $('.new_lc').each(function() {
 $(document).foundation('tab', 'reflow');
 }
 
-function select_nutriment(ui) {
+function select_nutriment(event,ui) {
 
 
 	//alert(ui.item.id + ' = ' + ui.item.value);
@@ -561,7 +561,7 @@ function update_display(imagefield, first_display) {
 					selected = ' ui-selected';
 					imgid = image.imgid;
 				}
-				html += '<li id="' + id + '_' + imgid + '" class="ui-state-default ui-selectee' + selected + '">';
+				html += '<li id="' + id + '_' + image.imgid + '" class="ui-state-default ui-selectee' + selected + '">';
 				html += '<img src="' + settings.img_path + image.thumb_url +'" title="'  + image.uploaded + ' - ' + image.uploader + '"/>';
 				
 				if ((stringStartsWith(id, 'manage')) && (admin)) {
