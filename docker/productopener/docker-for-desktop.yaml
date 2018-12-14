@@ -2,14 +2,14 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-host: po.2cd5584aef954497b837.eastus.aksapp.io
+host: po.at.home
 
 backend:
   name: backend
   replicaCount: 1
   image:
     repository: openfoodfacts/productopener-backend
-    tag: "20181021.6"
+    tag: latest
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
@@ -20,10 +20,10 @@ frontend:
   replicaCount: 1
   image:
     repository: openfoodfacts/productopener-frontend
-    tag: "20181021.6"
+    tag: latest
     pullPolicy: IfNotPresent
   service:
-    type: ClusterIP
+    type: NodePort
     port: 80
 
 memcached:
@@ -32,6 +32,8 @@ memcached:
 
 mongodb:
   usePassword: false
+  persistence:
+    storageClass: default-storage
 
 nameOverride: ""
 fullnameOverride: ""
@@ -41,11 +43,10 @@ ingress:
   annotations:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-    kubernetes.io/ingress.class: addon-http-application-routing
   path: /
   hosts:
-    - po.2cd5584aef954497b837.eastus.aksapp.io
-    - '*.po.2cd5584aef954497b837.eastus.aksapp.io'
+    - po.at.home
+    - '*.po.at.home'
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:

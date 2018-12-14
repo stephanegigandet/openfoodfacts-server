@@ -8,9 +8,11 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
-  storageClassName: {{ include "productopener.fullname" . }}-azurefile
+  storageClassName: default-storage
   accessModes:
     - ReadWriteMany
   resources:
     requests:
       storage: 1Gi
+  hostPath:
+    path: /po/data
