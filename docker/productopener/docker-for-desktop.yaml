@@ -9,7 +9,7 @@ backend:
   replicaCount: 1
   image:
     repository: openfoodfacts/productopener-backend
-    tag: latest
+    tag: docker-for-desktop-63
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
@@ -20,10 +20,10 @@ frontend:
   replicaCount: 1
   image:
     repository: openfoodfacts/productopener-frontend
-    tag: latest
+    tag: docker-for-desktop-63
     pullPolicy: IfNotPresent
   service:
-    type: NodePort
+    type: ClusterIP
     port: 80
 
 memcached:
@@ -33,15 +33,15 @@ memcached:
 mongodb:
   usePassword: false
   persistence:
-    storageClass: default-storage
+    enabled: false
 
 nameOverride: ""
 fullnameOverride: ""
 
 ingress:
   enabled: true
-  # annotations:
-    # kubernetes.io/ingress.class: nginx
+  annotations:
+    kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   path: /
   hosts:
