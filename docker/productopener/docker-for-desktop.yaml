@@ -9,7 +9,7 @@ backend:
   replicaCount: 1
   image:
     repository: openfoodfacts/productopener-backend
-    tag: docker-for-desktop-63
+    tag: latest
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
@@ -20,7 +20,7 @@ frontend:
   replicaCount: 1
   image:
     repository: openfoodfacts/productopener-frontend
-    tag: docker-for-desktop-63
+    tag: latest
     pullPolicy: IfNotPresent
   service:
     type: ClusterIP
