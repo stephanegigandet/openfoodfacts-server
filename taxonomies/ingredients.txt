@@ -34450,6 +34450,38 @@ wikidata:en:Q237169
 wikipedia:en:https://en.wikipedia.org/wiki/Seaweed
 
 <en:algae
+en:algae concentrate
+de:Algenkonzentrat
+es:concentrado de algas
+fr:concentré d'algues
+nl:algenconcentraat
+# ingredient/algae-concentrate has 10 products @2019-02-22
+# färbendes Lebensmittel: Saflorkonzentrat, Algenkonzentrat
+
+<en:seaweed
+en:dehydrated seaweed
+de:Seetang getrocknet
+fr:algues déshydratées
+it:alghe disidratate
+# ingredient/fr:algues-déshydratées has 15 products @2019-02-22
+
+<en:dehydrated seaweed
+fr:algues réhydratées
+# ingredient/fr:algues-réhydratées has 3 products 22019-02-22
+
+<en:seaweed
+fr:algue laminaire en poudre
+
+<en:seaweed
+fr:Algues bretonnes
+# ingredient/fr:Algues-bretonnes has 2 products @2019-02-22
+
+<en:seaweed
+fr:algues de Bretagne nord
+# ingredient/fr:algues-de-Bretagne-nord has 1 product @2019-02-22
+
+
+<en:algae
 en:Lithotamnium calcareum
 fr:algue lithothamnium calcareum, algue marine lithothamnium calcareum, 
 la:Lithotamnium calcareum
